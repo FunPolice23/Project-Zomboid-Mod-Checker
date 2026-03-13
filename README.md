@@ -22,3 +22,14 @@ Tired of broken mods after the big B42 update? This tool scans your mod (`.jar`,
 **License:** [MIT](LICENSE) – free to use, modify, and share.
 
 Just run the `.exe` (Windows) or `python gui.py` (Linux/macOS) and you're ready to mod again.
+
+Main Tab
+<img width="1920" height="1032" alt="main" src="https://github.com/user-attachments/assets/ee4f6dbd-55a6-489f-a120-297e683edfaa" />
+Console Tab
+<img width="1920" height="1032" alt="console" src="https://github.com/user-attachments/assets/1811db95-d83e-4672-97a5-355174f608fc" />
+Results Tab
+<img width="1920" height="1032" alt="results" src="https://github.com/user-attachments/assets/680500b3-1708-41de-90fe-d9d15f8a112d" />
+Docs Tab
+<img width="1920" height="1032" alt="docs" src="https://github.com/user-attachments/assets/ced93e6b-0698-41a1-b485-352338b58042" />
+Settings Tab
+<img width="1920" height="1032" alt="settings" src="https://github.com/user-attachments/assets/9ac04067-d16b-4088-a4fd-2c1295237942" />
