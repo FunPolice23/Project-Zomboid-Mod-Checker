@@ -693,11 +693,26 @@ class CompatibilityGUI(QMainWindow):
             self.game_entry.setText(path)
 
     def _browse_mod(self):
-        """Smart dialog - respects the mod mode radio buttons"""
+        """Flexible browse — respects radio buttons and allows BOTH .jar files and folders"""
         if self.mod_jar.isChecked():
-            path, _ = QFileDialog.getOpenFileName(self, "Select mod JAR", "", "JAR files (*.jar)")
+            # Folder Mode or Pure Lua: prefer folder picker, but allow .jar too
+            path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Select file",
+                "",
+                "All files (*.*)"
+            )
         else:
+            # JAR mode: prefer .jar but allow anything
             path = QFileDialog.getExistingDirectory(self, "Select mod folder")
+            if not path:  # fallback if user cancels folder dialog
+                path, _ = QFileDialog.getOpenFileName(
+                    self,
+                    "Select mod .jar file",
+                    "",
+                    "JAR files (*.jar);;All files (*.*)"
+                )
+
         if path:
             self.mod_entry.setText(path)
 
