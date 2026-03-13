@@ -1,0 +1,6 @@
+PyQt6>=6.5.0
+tqdm
+# pip install -r requirements.txt
+
+# kirjava is not on PyPI — install from the official source:
+# pip install git+https://github.com/notiska/kirjava.git
