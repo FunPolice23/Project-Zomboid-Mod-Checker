@@ -2,7 +2,7 @@
 
 **Quickly check if your mods will work on the latest Project Zomboid Build 42.**
 
-Tired of broken mods after the big B42 update? This tool scans your mod (`.jar`, decompiled folder, or pure Lua) against the real game code and tells you exactly what needs fixing.
+Tired of broken mods after the big B42 update? This tool scans your mod (`.jar`, decompiled folder, or pure Lua) against the game code and tells you what needs fixing.
 
 ### ✨ Features
 - Full Java bytecode analysis (missing methods, fields, changed signatures)
