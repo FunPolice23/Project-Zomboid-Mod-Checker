@@ -17,7 +17,6 @@ Quickly scan any mod (`.jar`, decompiled folder, or pure Lua) against the real g
 Installation
 Windows: Download the `.exe` and run it.  
 Linux / macOS:  
-bash
 pip install -r requirements.txt
 python gui.py
 
