@@ -21,4 +21,4 @@ Tired of broken mods after the big B42 update? This tool scans your mod (`.jar`,
 
 **License:** [MIT](LICENSE) – free to use, modify, and share.
 
-Just run the `.exe` (Windows) or `python gui.py` (Linux/macOS) and you're ready to mod again! 🧟
+Just run the `.exe` (Windows) or `python gui.py` (Linux/macOS) and you're ready to mod again.
