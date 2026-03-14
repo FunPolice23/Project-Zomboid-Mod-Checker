@@ -23,10 +23,15 @@ python gui.py
 CLI:
 python main.py <gamepath> <modpath> [options]
 options flags:
+
 --lua-only # skips java analysis, only checks against lua
+
 --no-cache # forces fresh game index, ignores any cache data if any.
+
 --ouput FILE or -o FILE # saves report to a text file
+
 --verbose or -V # gives more detailed references
+
 --cache File # uses a custom cache, defaults to game_api_cache.pkl
 
 # Examples
