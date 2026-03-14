@@ -1,15 +1,17 @@
-🧟 PZ Mod Compatibility Checker – Build 42 Edition
+🧟 # PZ Mod Compatibility Checker – Build 42 Edition
+
 The most accurate and user-friendly tool to check if your Project Zomboid mods will work on Build 42 (including the latest unstable patches).
 After the massive Build 42 update, thousands of mods broke because of changed Java methods, removed Lua events, deprecated hooks, and fragile calls. This tool scans your mod like the game does and tells you what needs fixing — before you waste time testing in-game.
 
-What It Does:
+#What It Does
+
 It performs a complete compatibility audit on any mod:
 
 Java analysis (.jar or decompiled folder) — detects missing classes, changed method signatures, removed fields, visibility issues, and inheritance problems using real bytecode parsing.
 Lua analysis (client/server/shared scripts) — catches deprecated events, fragile calls (getPlayer, SandboxVars, getCore, etc.), and old hooks that were removed in B42.
 Shows color-coded results (red = critical errors, orange = warnings) with exact file:line locations.
 
-Key Features
+# Key Features
 
 30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
 Full Workshop scanner with smart caching — scans 1000+ mods in seconds and remembers them
@@ -22,7 +24,7 @@ Clear cache buttons (Game API + Workshop) so you always stay up-to-date with the
 Full CLI support for scripting or batch checking
 Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux, ~/Library/Application Support/PZModChecker on macOS)
 
-How It Works:
+#How It Works
 
 Uses kirjava for accurate Java bytecode parsing (opcodes, constant pool, LineNumberTable, inheritance traversal)
 Smart Lua regex with word-boundary protection (no false positives)
@@ -30,17 +32,17 @@ Version detection that falls back to Lua keywords when mod.info is missing
 Fast caching system (versioned JSON + pickle) — first scan builds the index, later scans are near-instant
 Thread-safe GUI with live batch updates so the interface never freezes
 
-Installation & Usage
+# Installation & Usage
 Windows users
 Download the single .exe and run it — no Python required.
-Linux / macOS users
-Bashpip install -r requirements.txt
+# Linux / macOS users
+Bash pip install -r requirements.txt
 python gui.py
 
-License
+# License
 This project is licensed under the MIT License — free to use, modify, and redistribute.
 
-CLI:
+# CLI:
 python main.py <gamepath> <modpath> [options]
 options flags:
 
