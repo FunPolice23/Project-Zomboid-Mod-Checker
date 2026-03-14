@@ -1,24 +1,44 @@
 🧟 PZ Mod Compatibility Checker – Build 42 Edition
+The most accurate and user-friendly tool to check if your Project Zomboid mods will work on Build 42 (including the latest unstable patches).
+After the massive Build 42 update, thousands of mods broke because of changed Java methods, removed Lua events, deprecated hooks, and fragile calls. This tool scans your mod like the game does and tells you what needs fixing — before you waste time testing in-game.
 
-Fast, accurate checker for Project Zomboid Build 42 mods.**
+What It Does:
+It performs a complete compatibility audit on any mod:
 
-Quickly scan any mod (`.jar`, decompiled folder, or pure Lua) against the real game code and see exactly what needs updating for the latest unstable builds.
+Java analysis (.jar or decompiled folder) — detects missing classes, changed method signatures, removed fields, visibility issues, and inheritance problems using real bytecode parsing.
+Lua analysis (client/server/shared scripts) — catches deprecated events, fragile calls (getPlayer, SandboxVars, getCore, etc.), and old hooks that were removed in B42.
+Shows color-coded results (red = critical errors, orange = warnings) with exact file:line locations.
 
-✨ Features
-- Full Java bytecode analysis (missing methods/fields, changed signatures)
-- Smart Lua scanning (deprecated events, fragile calls like `getPlayer`, `SandboxVars`, old hooks)
-- Color-coded Results tab (red = errors, orange = warnings)
-- 30 beautiful themes (dark, light, neon, sunset, cyber, etc.)
-- Workshop scanner with fast caching (loads 1000+ mods instantly)
-- “📁 Open Data Folder” button — everything saved neatly in the correct native folder
-- GUI + simple CLI support
-- Cross-platform (Windows .exe + full source for Linux/macOS)
+Key Features
 
-Installation
-Windows: Download the `.exe` and run it.  
-Linux / macOS:  
-pip install -r requirements.txt
+30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
+Full Workshop scanner with smart caching — scans 1000+ mods in seconds and remembers them
+Deep mod support — correctly handles complex folder structures (common/, 42/, nested mods like Knox Event Expanded)
+Open Data Folder button — instantly opens where all caches, reports, and logs are saved (native location on every OS)
+Color-coded Results tab that stays populated (no more blank screen)
+Drag-to-move borderless window + transparency slider
+Built-in B42 documentation links (official Lua events, callbacks, JavaDocs)
+Clear cache buttons (Game API + Workshop) so you always stay up-to-date with the newest unstable builds
+Full CLI support for scripting or batch checking
+Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux, ~/Library/Application Support/PZModChecker on macOS)
+
+How It Works:
+
+Uses kirjava for accurate Java bytecode parsing (opcodes, constant pool, LineNumberTable, inheritance traversal)
+Smart Lua regex with word-boundary protection (no false positives)
+Version detection that falls back to Lua keywords when mod.info is missing
+Fast caching system (versioned JSON + pickle) — first scan builds the index, later scans are near-instant
+Thread-safe GUI with live batch updates so the interface never freezes
+
+Installation & Usage
+Windows users
+Download the single .exe and run it — no Python required.
+Linux / macOS users
+Bashpip install -r requirements.txt
 python gui.py
+
+License
+This project is licensed under the MIT License — free to use, modify, and redistribute.
 
 CLI:
 python main.py <gamepath> <modpath> [options]
