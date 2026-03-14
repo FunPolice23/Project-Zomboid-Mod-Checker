@@ -7,22 +7,30 @@ After the massive Build 42 update, thousands of mods broke because of changed Ja
 
 It performs a complete compatibility audit on any mod:
 
-Java analysis (.jar or decompiled folder) — detects missing classes, changed method signatures, removed fields, visibility issues, and inheritance problems using real bytecode parsing.
+Java analysis (.jar or decompiled folder) — detects missing classes, changed method signatures, removed fields,
+visibility issues, and inheritance problems using real bytecode parsing.
+
 Lua analysis (client/server/shared scripts) — catches deprecated events, fragile calls (getPlayer, SandboxVars, getCore, etc.), and old hooks that were removed in B42.
+
 Shows color-coded results (red = critical errors, orange = warnings) with exact file:line locations.
 
 # Key Features
 
 30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
+
 Full Workshop scanner with smart caching — scans 1000+ mods in seconds and remembers them
 Deep mod support — correctly handles complex folder structures (common/, 42/, nested mods like Knox Event Expanded)
+
 Open Data Folder button — instantly opens where all caches, reports, and logs are saved (native location on every OS)
+
 Color-coded Results tab that stays populated (no more blank screen)
 Drag-to-move borderless window + transparency slider
 Built-in B42 documentation links (official Lua events, callbacks, JavaDocs)
 Clear cache buttons (Game API + Workshop) so you always stay up-to-date with the newest unstable builds
+
 Full CLI support for scripting or batch checking
-Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux, ~/Library/Application Support/PZModChecker on macOS)
+Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux,
+~/Library/Application Support/PZModChecker on macOS)
 
 #How It Works
 
