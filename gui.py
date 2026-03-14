@@ -5,6 +5,7 @@ import threading
 import webbrowser
 from pathlib import Path
 import platform
+import subprocess, os
 
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout,
@@ -17,22 +18,12 @@ from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QFont, QColor
 
 # ── split modules ──
-from gui_helpers import find_pz_workshop_content_path, get_steam_install_path, parse_libraryfolders_vdf
+from gui_helpers import find_pz_workshop_content_path, get_steam_install_path, parse_libraryfolders_vdf, DOCS_DIR
 from gui_workshop import WorkshopScanner, CACHE_FILE
 from gui_themes import THEME_STYLES
 from indexer import GameAPI
 from modparser import ModReferences
 from comparison import CompatibilityChecker
-
-# Cross-platform user data folder
-if platform.system() == "Windows":
-    DOCS_DIR = Path.home() / "Documents" / "PZModChecker"
-elif platform.system() == "Darwin":          # macOS
-    DOCS_DIR = Path.home() / "Library" / "Application Support" / "PZModChecker"
-else:                                        # Linux and everything else
-    DOCS_DIR = Path.home() / ".config" / "PZModChecker"
-
-DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
 class ConsoleRedirect:
     def __init__(self, text_widget):
@@ -73,7 +64,7 @@ class CompatibilityGUI(QMainWindow):
         #self.tabs.currentChanged.connect(self._on_tab_changed)
         self._load_last_paths()
         self._detect_workshop()
-        self.statusBar().showMessage("✅ Fully polished — kirjava + deep mods + 12 themes ready!")
+        self.statusBar().showMessage("✅ Initiated - Enjoy")
         self._on_mode_changed()
 
     # Settings Tab    
@@ -190,12 +181,14 @@ class CompatibilityGUI(QMainWindow):
             self.console_text.append("🗑️ Workshop cache cleared — ready for fresh scan!\n")
 
     def _open_data_folder(self):
-        """Opens the folder where all caches, reports, and logs are saved"""
-        import webbrowser
-        from pathlib import Path
-        folder = Path(self.cache_var).parent  # uses the same DOCS_DIR we already set up
+        folder = Path(self.cache_var).parent
         try:
-            webbrowser.open(str(folder))
+            if platform.system() == "Windows":
+                os.startfile(folder)
+            elif platform.system() == "Darwin":
+                subprocess.Popen(["open", str(folder)])
+            else:
+                subprocess.Popen(["xdg-open", str(folder)])
             self.console_text.append(f"📁 Opened data folder: {folder}\n")
         except Exception as e:
             QMessageBox.warning(self, "Open Folder", f"Could not open folder:\n{str(e)}")
@@ -304,7 +297,6 @@ class CompatibilityGUI(QMainWindow):
         ws_group.setLayout(ws_layout)
         layout.addWidget(ws_group)
 
-        # ── Bottom button row (exactly as you wanted) ──
         bottom_row = QHBoxLayout()
         self.run_btn = QPushButton("🚀 Run Compatibility Check")
         self.run_btn.setFixedHeight(55)
@@ -591,7 +583,7 @@ class CompatibilityGUI(QMainWindow):
             return
         self._populating = True
 
-        self.console_text.append(f"DEBUG: Populating Results tab with {len(self.current_issues)} issues...")
+        self.console_text.append(f"Populating Results tab with {len(self.current_issues)} issues...")
 
         self.results_tree.setUpdatesEnabled(False)
         self.results_tree.clear()
@@ -634,7 +626,7 @@ class CompatibilityGUI(QMainWindow):
 
         QTimer.singleShot(0, self.results_tree.repaint)
         QTimer.singleShot(30, self.results_tree.viewport().update)
-        QTimer.singleShot(80, self.results_tree.repaint)
+        #QTimer.singleShot(80, self.results_tree.repaint)
         QTimer.singleShot(250, self._select_first_item_safe)
 
         self.console_text.append(f"✅ Results tab populated with {len(self.current_issues)} items — visible now!\n")
@@ -693,26 +685,10 @@ class CompatibilityGUI(QMainWindow):
             self.game_entry.setText(path)
 
     def _browse_mod(self):
-        """Flexible browse — respects radio buttons and allows BOTH .jar files and folders"""
         if self.mod_jar.isChecked():
-            # Folder Mode or Pure Lua: prefer folder picker, but allow .jar too
-            path, _ = QFileDialog.getOpenFileName(
-                self,
-                "Select file",
-                "",
-                "All files (*.*)"
-            )
+            path, _ = QFileDialog.getOpenFileName(self, "Select mod JAR", "", "JAR files (*.jar)")
         else:
-            # JAR mode: prefer .jar but allow anything
             path = QFileDialog.getExistingDirectory(self, "Select mod folder")
-            if not path:  # fallback if user cancels folder dialog
-                path, _ = QFileDialog.getOpenFileName(
-                    self,
-                    "Select mod .jar file",
-                    "",
-                    "JAR files (*.jar);;All files (*.*)"
-                )
-
         if path:
             self.mod_entry.setText(path)
 
