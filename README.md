@@ -5,7 +5,7 @@ The most accurate and user-friendly tool to check if your Project Zomboid mods w
 After the massive Build 42 update, thousands of mods broke because of changed Java methods, removed Lua events,
 deprecated hooks, and fragile calls. This tool scans your mod like the game does and tells you what needs fixing — before you waste time testing in-game.
 
-# What It Does
+## What It Does
 
 It performs a complete compatibility audit on any mod:
 
@@ -18,7 +18,7 @@ Lua analysis (client/server/shared scripts) — catches deprecated events, fragi
 
 Shows color-coded results (red = critical errors, orange = warnings) with exact file:line locations.
 
-# Key Features
+## Key Features
 
 30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
 
@@ -37,7 +37,7 @@ Full CLI support for scripting or batch checking
 Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux,
 ~/Library/Application Support/PZModChecker on macOS)
 
-# How It Works
+## How It Works
 
 Uses kirjava for accurate Java bytecode parsing (opcodes, constant pool, LineNumberTable, inheritance traversal)
 
@@ -48,17 +48,17 @@ Fast caching system (versioned JSON + pickle) — first scan builds the index, l
 
 Thread-safe GUI with live batch updates so the interface never freezes
 
-# Installation & Usage
+### Installation & Usage
 Windows users
 Download the single .exe and run it — no Python required.
-# Linux / macOS users
+### Linux / macOS users
 Bash pip install -r requirements.txt
 python gui.py
 
-# License
+### License
 This project is licensed under the MIT License — free to use, modify, and redistribute.
 
-# CLI:
+### CLI:
 python main.py <gamepath> <modpath> [options]
 options flags:
 
@@ -72,7 +72,7 @@ options flags:
 
 --cache File # uses a custom cache, defaults to game_api_cache.pkl
 
-# Examples
+### Examples
 python main.py "[drive:]\Steam\steamapps\common\ProjectZomboid\projectzomboid.jar" "MyModFolder"
 
 
