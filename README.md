@@ -72,7 +72,7 @@ options flags:
 
 --cache File # uses a custom cache, defaults to game_api_cache.pkl
 
-### Examples
+### Examples:
 python main.py "[drive:]\Steam\steamapps\common\ProjectZomboid\projectzomboid.jar" "MyModFolder"
 
 
