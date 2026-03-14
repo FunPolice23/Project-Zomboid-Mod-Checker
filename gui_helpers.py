@@ -1,3 +1,4 @@
+
 import re
 import platform
 try:
@@ -20,6 +21,8 @@ DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_steam_install_path() -> Path | None:
     """Find Steam install path — works on 99% of machines (including custom installs)"""
+    if not _HAS_WINREG:
+        return None
     candidates = [
         (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Valve\Steam"),
         (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Valve\Steam"),
