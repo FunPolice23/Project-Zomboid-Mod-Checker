@@ -37,6 +37,8 @@ Full CLI support for scripting or batch checking
 Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux,
 ~/Library/Application Support/PZModChecker on macOS)
 
+Interactive map from https://b42map.com/
+
 ## How It Works
 
 Uses kirjava for accurate Java bytecode parsing (opcodes, constant pool, LineNumberTable, inheritance traversal)
