@@ -4,6 +4,7 @@
 
 # === Runtime dependencies (needed to run the program) ===
 PyQt6>=6.5.0
+PyQt6-WebEngine # add a # infront to comment out, needed for B42 interactive map.
 tqdm
 
 # === Build dependencies (needed to create the .exe with Pyinstaller) ===
