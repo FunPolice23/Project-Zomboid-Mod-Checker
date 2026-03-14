@@ -10,7 +10,9 @@ It performs a complete compatibility audit on any mod:
 Java analysis (.jar or decompiled folder) — detects missing classes, changed method signatures, removed fields,
 visibility issues, and inheritance problems using real bytecode parsing.
 
+
 Lua analysis (client/server/shared scripts) — catches deprecated events, fragile calls (getPlayer, SandboxVars, getCore, etc.), and old hooks that were removed in B42.
+
 
 Shows color-coded results (red = critical errors, orange = warnings) with exact file:line locations.
 
@@ -20,6 +22,7 @@ Shows color-coded results (red = critical errors, orange = warnings) with exact 
 
 Full Workshop scanner with smart caching — scans 1000+ mods in seconds and remembers them
 Deep mod support — correctly handles complex folder structures (common/, 42/, nested mods like Knox Event Expanded)
+
 
 Open Data Folder button — instantly opens where all caches, reports, and logs are saved (native location on every OS)
 
