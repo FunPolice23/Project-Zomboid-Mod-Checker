@@ -14,7 +14,8 @@ from PyQt6.QtWidgets import (
     QGraphicsOpacityEffect, QCheckBox, QSlider, QRadioButton, QButtonGroup,
     QHeaderView
 )
-from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
+from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QUrl
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtGui import QFont, QColor
 
 # ── split modules ──
@@ -200,18 +201,21 @@ class CompatibilityGUI(QMainWindow):
         self.tab_main = QWidget()
         self.tab_console = QWidget()
         self.tab_results = QWidget()
+        self.tab_map = QWidget()
         self.tab_docs = QWidget()
         self.tab_settings = QWidget()
 
         self.tabs.addTab(self.tab_main, "🏠 Main")
         self.tabs.addTab(self.tab_console, "📜 Console")
         self.tabs.addTab(self.tab_results, "📊 Results")
+        self.tabs.addTab(self.tab_map, "🗺️ B42 Map")
         self.tabs.addTab(self.tab_docs, "📖 B42 Docs")
         self.tabs.addTab(self.tab_settings, "⚙️ Settings")
 
         self._build_main_tab()
         self._build_console_tab()
         self._build_results_tab()
+        self._build_map_tab()
         self._build_docs_tab()
         self._build_settings_tab()
 
@@ -314,6 +318,23 @@ class CompatibilityGUI(QMainWindow):
         layout.addLayout(bottom_row)
 
         self.tab_main.setLayout(layout)
+
+    def _build_map_tab(self):
+        layout = QVBoxLayout()
+        btn_row = QHBoxLayout()
+        
+        self.map_b42_btn = QPushButton("🗺️ B42 Map")
+        self.map_b41_btn = QPushButton("🗺️ Classic Map")
+        self.map_b42_btn.clicked.connect(lambda: self.map_view.setUrl(QUrl("https://b42map.com/")))
+        self.map_b41_btn.clicked.connect(lambda: self.map_view.setUrl(QUrl("https://map.projectzomboid.com/")))
+        btn_row.addWidget(self.map_b42_btn)
+        btn_row.addWidget(self.map_b41_btn)
+        layout.addLayout(btn_row)
+
+        self.map_view = QWebEngineView()
+        self.map_view.setUrl(QUrl("https://b42map.com/"))
+        layout.addWidget(self.map_view, stretch=1)
+        self.tab_map.setLayout(layout)
 
     def _build_docs_tab(self):
         layout = QVBoxLayout()
