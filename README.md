@@ -35,12 +35,15 @@ Full CLI support for scripting or batch checking
 Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux,
 ~/Library/Application Support/PZModChecker on macOS)
 
-#How It Works
+# How It Works
 
 Uses kirjava for accurate Java bytecode parsing (opcodes, constant pool, LineNumberTable, inheritance traversal)
+
+
 Smart Lua regex with word-boundary protection (no false positives)
 Version detection that falls back to Lua keywords when mod.info is missing
 Fast caching system (versioned JSON + pickle) — first scan builds the index, later scans are near-instant
+
 Thread-safe GUI with live batch updates so the interface never freezes
 
 # Installation & Usage
