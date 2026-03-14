@@ -85,24 +85,33 @@ class WorkshopScanner:
 
     @staticmethod
     def _recurse_mod_folder(gui, folder: Path, depth: int = 0):
-        if not gui.scanning or depth > 8: return   # increased depth for deep mods
-
-        # NEW: Check for mod.info FIRST — before skipping common/42
-        if (folder / "mod.info").exists():
-            abs_path = str(folder.resolve())
-            if abs_path in gui.seen_mod_roots: return
-            gui.seen_mod_roots.add(abs_path)
-            WorkshopScanner._process_single_mod(gui, folder)
+        if not gui.scanning or depth > 10: 
             return
 
+        # ── Check for mod.info FIRST ──
+        if (folder / "mod.info").exists():
+            abs_path = str(folder.resolve())
+            if abs_path in gui.seen_mod_roots: 
+                return
+            gui.seen_mod_roots.add(abs_path)
+
+            # Climb up past common/, 42/, AND mods/ to get the TRUE mod root
+            true_root = folder
+            while true_root.name.lower() in {"common", "42", "mods"} and true_root.parent != true_root:
+                true_root = true_root.parent
+
+            WorkshopScanner._process_single_mod(gui, true_root)
+            return
+
+        # ── Recurse into common/42/mods folders ──
         folder_lower = folder.name.lower()
-        if folder_lower in {"common", "42"}:
-            # Still recurse inside them (KnoxEventExpanded style)
+        if folder_lower in {"common", "42", "mods"}:
             for sub in folder.iterdir():
                 if sub.is_dir():
                     WorkshopScanner._recurse_mod_folder(gui, sub, depth + 1)
             return
 
+        # Normal recursion
         for sub in folder.iterdir():
             if sub.is_dir():
                 WorkshopScanner._recurse_mod_folder(gui, sub, depth + 1)
