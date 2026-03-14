@@ -36,9 +36,13 @@ options flags:
 
 # Examples
 python main.py "[drive:]\Steam\steamapps\common\ProjectZomboid\projectzomboid.jar" "MyModFolder"
+
 python main.py dummy.jar MyModFolder --lua-only
+
 python main.py projectzomboid.jar MyMod.jar -o my_report.txt
+
 python main.py projectzomboid.jar MyMod --no-cache -v
+
 python main.py --help
 
 Main Tab
