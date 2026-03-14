@@ -65,7 +65,7 @@ class CompatibilityGUI(QMainWindow):
         #self.tabs.currentChanged.connect(self._on_tab_changed)
         self._load_last_paths()
         self._detect_workshop()
-        self.statusBar().showMessage("✅ Initiated - Enjoy")
+        self.statusBar().showMessage("✅ v1.2 - Initiated - Enjoy")
         self._on_mode_changed()
 
     # Settings Tab    
@@ -326,15 +326,13 @@ class CompatibilityGUI(QMainWindow):
         self.map_b42_btn = QPushButton("🗺️ B42 Map")
         self.map_b41_btn = QPushButton("🗺️ Classic Map")
         self.map_b42_btn.clicked.connect(lambda: self.map_view.setUrl(QUrl("https://b42map.com/")))
-        self.map_b41_btn.clicked.connect(lambda: self.map_view.setUrl(QUrl("https://map.projectzomboid.com/")))
         btn_row.addWidget(self.map_b42_btn)
-        btn_row.addWidget(self.map_b41_btn)
         layout.addLayout(btn_row)
 
         self.map_view = QWebEngineView()
         self.map_view.setUrl(QUrl("https://b42map.com/"))
         layout.addWidget(self.map_view, stretch=1)
-        self.tab_map.setLayout(layout)
+        #self.tab_map.setLayout(layout)
 
     def _build_docs_tab(self):
         layout = QVBoxLayout()
