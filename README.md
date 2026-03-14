@@ -20,6 +20,22 @@ Linux / macOS:
 pip install -r requirements.txt
 python gui.py
 
+CLI:
+python main.py <gamepath> <modpath> [options]
+options flags:
+--lua-only # skips java analysis, only checks against lua
+--no-cache # forces fresh game index, ignores any cache data if any.
+--ouput FILE or -o FILE # saves report to a text file
+--verbose or -V # gives more detailed references
+--cache File # uses a custom cache, defaults to game_api_cache.pkl
+
+# Examples
+python main.py "[drive:]\Steam\steamapps\common\ProjectZomboid\projectzomboid.jar" "MyModFolder"
+python main.py dummy.jar MyModFolder --lua-only
+python main.py projectzomboid.jar MyMod.jar -o my_report.txt
+python main.py projectzomboid.jar MyMod --no-cache -v
+python main.py --help
+
 Main Tab
 <img width="1920" height="1032" alt="main" src="https://github.com/user-attachments/assets/ee4f6dbd-55a6-489f-a120-297e683edfaa" />
 Console Tab
