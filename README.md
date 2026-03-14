@@ -85,7 +85,7 @@ python main.py projectzomboid.jar MyMod --no-cache -v
 python main.py --help
 
 ### My purpose for the program
-I enjoy project zomboid but recently a great mod/modder gave up which left there mod outdated, new unstable build changed certain things so this idea came in order to privatly update the mod myself with ease so I can play it again.
+I enjoy project zomboid but recently a great mod/modder gave up which left their mod outdated, new unstable build changed certain things so this idea came in order to privatly update the mod myself with ease so I can play it again.
 
 My hope is that mabye this helps bring old mods back,
 mabye help new mods as well.
