@@ -1,6 +1,12 @@
-import winreg
+
 import re
 import platform
+try:
+    import winreg
+    _HAS_WINREG = True
+except ImportError:
+    _HAS_WINREG = False
+
 from pathlib import Path
 
 # Cross-platform user data folder
@@ -77,10 +83,10 @@ def estimate_compat_from_modinfo(mod_folder: Path) -> tuple[str, str]:
                     if line.lower().startswith("name="):
                         display_name = line.split("=", 1)[1].strip().strip('"\'')
                         break
-            for pat in [r'42\.\d+', r'build\s*42', r'b42', r'\[b?42', r'versionmin.*42', r'version.*42', r'42\.0', r'build42']:
+            for pat in [r'42\.\d+', r'build\s*42', r'b42', r'\[b?42', r'versionmin.*42', r'versionMin.*42', r'version.*42', r'42\.0', r'build42']:
                 if re.search(pat, content):
                     versions_found.add("42")
-            for pat in [r'41\.\d+', r'build\s*41', r'b41', r'\[b?41', r'versionmin.*41']:
+            for pat in [r'41\.\d+', r'build\s*41', r'b41', r'\[b?41', r'versionmin.*41', r'versionMin.*41']:
                 if re.search(pat, content):
                     versions_found.add("41")
         except:
@@ -90,27 +96,27 @@ def estimate_compat_from_modinfo(mod_folder: Path) -> tuple[str, str]:
     for item in mod_folder.rglob("*"):
         if item.is_dir():
             name = item.name.lower()
-            if any(x in name for x in ['42.', 'b42', 'build42', '42_']):
+            if any(x in name for x in ['42.', 'b42', 'B42', 'build42', 'Build42', 'Build 42', '42_']):
                 versions_found.add("42")
-            if any(x in name for x in ['41.', 'b41', 'build41']):
+            if any(x in name for x in ['41.', 'b41', 'B41', 'build41', 'Build 41', 'Build41']):
                 versions_found.add("41")
 
     # 3. NEW: Fallback — scan Lua files for B42 keywords (catches mods without version tags)
     for lua_file in mod_folder.rglob("*.lua"):
         try:
             text = lua_file.read_text(encoding="utf-8", errors="ignore").lower()
-            if any(x in text for x in ['42.', 'b42', 'build42', 'onplayerupdate', 'getplayer', 'oncreateplayer', 'onfillworldobjectcontextmenu']):
+            if any(x in text for x in ['42.', 'b42', 'B42', 'build42', 'Build42', 'Build 42', 'onplayerupdate', 'getplayer', 'oncreateplayer', 'onfillworldobjectcontextmenu']):
                 versions_found.add("42")
-            if any(x in text for x in ['41.', 'b41', 'build41']):
+            if any(x in text for x in ['41.', 'b41', 'B41', 'build41', 'Build41', 'Build 41']):
                 versions_found.add("41")
         except:
             pass
 
     # Structure check
     has_common = (mod_folder / "common").exists()
-    has_42_folder = any((mod_folder / f"42{x}").exists() for x in ["", ".", "1", "15", ".15", "_"])
+    has_42_folder = any((mod_folder / f"42{x}").exists() for x in ["", ".", "1", "2", "3", "15", ".13", ".14", ".14.1", ".15", ".15.1", "15.2", "_"])
     if not has_common and not has_42_folder:
-        structure = "❌ missing common/ + 42/"
+        structure = "❌ No common or 42 folders | Unknown Ver"
 
     if versions_found:
         vlist = sorted(versions_found)
@@ -119,10 +125,10 @@ def estimate_compat_from_modinfo(mod_folder: Path) -> tuple[str, str]:
         else:
             compat = f"✅ B{vlist[0]} {structure}"
     else:
-        compat = f"Unknown {structure}"
+        compat = f"Unknown Ver. {structure}"
 
     return display_name, compat
 
 
 if __name__ == "__main__":
-    print("gui_helpers loaded — enhanced B42 version detection ready")
+    print("gui_helpers loaded — enhanced B42 unstable version detection ready")
