@@ -1,4 +1,4 @@
-🧟 PZ Mod Compatibility Checker – Build 42 Edition
+# PZ Mod Compatibility Checker – Build 42 Edition 🧟
 
 The most accurate and user-friendly tool to check if your Project Zomboid mods will work on Build 42 (including the latest unstable patches).
 
