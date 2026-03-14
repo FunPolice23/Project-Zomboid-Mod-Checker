@@ -3,7 +3,6 @@
 The most accurate and user-friendly tool to check if your Project Zomboid mods will work on Build 42 (including the latest unstable patches).
 
 After the massive Build 42 update, thousands of mods broke because of changed Java methods, removed Lua events,
-
 deprecated hooks, and fragile calls. This tool scans your mod like the game does and tells you what needs fixing — before you waste time testing in-game.
 
 # What It Does
