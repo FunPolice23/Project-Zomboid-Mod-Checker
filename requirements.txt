@@ -1,6 +1,21 @@
+# ================================================
+# PZ Mod Compatibility Checker - Requirements
+# ================================================
+
+# === Runtime dependencies (needed to run the program) ===
 PyQt6>=6.5.0
 tqdm
-# pip install -r requirements.txt
 
-# kirjava is not on PyPI — install from the official source:
+# === Build dependencies (needed to create the .exe with Nuitka) ===
+nuitka
+zstandard
+
+# ================================================
+# Special installation notes
+# ================================================
+
+# kirjava is not on PyPI — install from GitHub:
 # pip install git+https://github.com/notiska/kirjava.git
+
+# How to install everything:
+# pip install -r requirements.txt
