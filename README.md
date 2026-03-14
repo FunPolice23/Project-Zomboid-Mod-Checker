@@ -39,7 +39,7 @@ Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.conf
 
 Interactive map from https://b42map.com/
 
-###Additional future updates:
+### Additional future updates:
 Save information, Mod Conflict Check, Quick fix suggestions per error type.
 
 ## How It Works
