@@ -7,21 +7,10 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        # All split gui modules must be bundled explicitly
-        ('gui_debug.py',    '.'),
-        ('gui_save.py',     '.'),
-        ('gui_conflict.py', '.'),
-        ('gui_quickfix.py', '.'),
-        ('gui_tabs.py',     '.'),
-        ('gui_workshop.py', '.'),
-        ('gui_helpers.py',  '.'),
-        ('gui_themes.py',   '.'),
-        # Core analysis modules
-        ('indexer.py',      '.'),
-        ('modparser.py',    '.'),
-        ('comparison.py',   '.'),
-        ('luaparser.py',    '.'),
-        ('constants.py',    '.'),
+        # Non-Python assets only. All .py modules are found automatically
+        # by PyInstaller's import tracer — do NOT list them here.
+        # Add any data files your mod needs here, e.g.:
+        # ('icon.ico', '.'),
     ],
     hiddenimports=[
         'PyQt6.QtCore',
