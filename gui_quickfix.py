@@ -353,6 +353,173 @@ QUICK_FIX_DB: list[dict] = [
         ),
         "docs":     "https://demiurgequantified.github.io/ProjectZomboidJavaDocs/",
     },
+
+    # ── Lua – Hooks (B42 Hooks API) ───────────────────────────────────────────
+    {
+        "match":    "WeaponSwing",
+        "category": "Lua – Hook",
+        "problem":  "WeaponSwing is a B42 Hook, not an Event. It is called when a weapon is swung to find targets.",
+        "fix":      "Register via Hooks.WeaponSwing.Add(), not Events.WeaponSwing.Add(). Hooks have different semantics — they can modify behaviour, not just observe it.",
+        "code":     (
+            "-- WRONG (Event syntax)\n"
+            "Events.WeaponSwing.Add(function(character, weapon) end)\n\n"
+            "-- CORRECT (Hook syntax — B42)\n"
+            "Hooks.WeaponSwing.Add(function(character, weapon)\n"
+            "    -- character: IsoGameCharacter\n"
+            "    -- weapon: HandWeapon\n"
+            "end)"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Hooks.html",
+    },
+    {
+        "match":    "WeaponHitCharacter",
+        "category": "Lua – Hook",
+        "problem":  "WeaponHitCharacter is a B42 Hook called when attack effects are calculated. Not an Event.",
+        "fix":      "Register via Hooks.WeaponHitCharacter.Add(). Parameters: attacker, target, weapon, damageSplit.",
+        "code":     (
+            "-- CORRECT (B42 Hook)\n"
+            "Hooks.WeaponHitCharacter.Add(\n"
+            "function(attacker, target, weapon, damageSplit)\n"
+            "    -- attacker, target: IsoGameCharacter\n"
+            "    -- weapon: HandWeapon\n"
+            "    -- damageSplit: number\n"
+            "end)"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Hooks.html",
+    },
+    {
+        "match":    "CalculateStats",
+        "category": "Lua – Hook",
+        "problem":  "CalculateStats is a B42 Hook called when a character's stats are updated. Not an Event.",
+        "fix":      "Register via Hooks.CalculateStats.Add(). Note: character health is not included in this hook.",
+        "code":     (
+            "-- CORRECT (B42 Hook)\n"
+            "Hooks.CalculateStats.Add(function(character)\n"
+            "    -- character: IsoGameCharacter\n"
+            "    -- Modify stats here; health is NOT included\n"
+            "end)"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Hooks.html",
+    },
+
+    # ── Lua – Callbacks (B42 Callback system) ─────────────────────────────────
+    {
+        "match":    "CraftRecipe_OnCreate",
+        "category": "Lua – Callback",
+        "problem":  "CraftRecipe_OnCreate is a B42 callback called when successfully crafting a recipe using the new crafting system.",
+        "fix":      "Assign the callback in your recipe definition. Parameters: recipeData (CraftRecipeData), character (IsoGameCharacter or nil for workstations).",
+        "code":     (
+            "-- Assign in recipe script definition:\n"
+            "recipe MyRecipe\n"
+            "    ...\n"
+            "    OnCreate: MyMod_OnCraftRecipe,\n"
+            "end\n\n"
+            "-- Lua function:\n"
+            "function MyMod_OnCraftRecipe(recipeData, character)\n"
+            "    -- character may be nil if crafted by a workstation\n"
+            "    if character then\n"
+            "        character:getInventory():addItem(\"Base.Axe\")\n"
+            "    end\n"
+            "end"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Callbacks.html",
+    },
+    {
+        "match":    "Recipe_OnCreate",
+        "category": "Lua – Callback",
+        "problem":  "Recipe_OnCreate is the legacy recipe callback. In B42 the crafting system changed — check if you need CraftRecipe_OnCreate instead.",
+        "fix":      "Parameters: sources (ArrayList of items), result (InventoryItem), character (IsoGameCharacter), item (the right-clicked item or nil).",
+        "code":     (
+            "-- Legacy recipe OnCreate callback:\n"
+            "function MyOnCreate(sources, result, character, item)\n"
+            "    -- sources: ArrayList<InventoryItem>\n"
+            "    -- result: InventoryItem\n"
+            "    -- character: IsoGameCharacter\n"
+            "end\n\n"
+            "-- In .txt recipe definition:\n"
+            "recipe My Recipe\n"
+            "    ...\n"
+            "    OnCreate: MyOnCreate,\n"
+            "end"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Callbacks.html",
+    },
+    {
+        "match":    "Item_OnCreate",
+        "category": "Lua – Callback",
+        "problem":  "Item_OnCreate callback is called when an item is first created, before being placed in a container.",
+        "fix":      "Assign in the item script. Parameter: item (InventoryItem). Use to initialise custom moddata or set default properties.",
+        "code":     (
+            "-- In item script (.txt):\n"
+            "item MyItem\n"
+            "    ...\n"
+            "    OnCreate: MyMod_OnItemCreate,\n"
+            "end\n\n"
+            "-- Lua function:\n"
+            "function MyMod_OnItemCreate(item)\n"
+            "    item:getModData().MyMod = { initialized = true }\n"
+            "end"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Callbacks.html",
+    },
+    {
+        "match":    "Recipe_OnCanPerform",
+        "category": "Lua – Callback",
+        "problem":  "Recipe_OnCanPerform is called to check if a character can craft a recipe. Must return a boolean.",
+        "fix":      "Return true to allow, false to block. Called before showing the option AND every tick during crafting.",
+        "code":     (
+            "-- In .txt recipe:\n"
+            "recipe My Recipe\n"
+            "    ...\n"
+            "    OnCanPerform: MyMod_CanPerform,\n"
+            "end\n\n"
+            "-- Lua function:\n"
+            "function MyMod_CanPerform(recipe, character, item)\n"
+            "    -- item may be nil when checking craft menu visibility\n"
+            "    if character:getPerkLevel(Perks.Strength) >= 3 then\n"
+            "        return true\n"
+            "    end\n"
+            "    return false\n"
+            "end"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Callbacks.html",
+    },
+
+    # ── Lua – deprecated/removed B41 patterns ────────────────────────────────
+    {
+        "match":    "deprecated hook",
+        "category": "Lua – Deprecated Hook",
+        "problem":  "A hook or callback marked as deprecated or removed in B42.",
+        "fix":      "Check the B42 Hooks and Callbacks pages for the current equivalent.",
+        "code":     (
+            "-- Check B42 Hooks:\n"
+            "-- https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Hooks.html\n\n"
+            "-- Check B42 Callbacks:\n"
+            "-- https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Callbacks.html"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Hooks.html",
+    },
+    {
+        "match":    "HaloTextHelper",
+        "category": "Lua – Fragile Call",
+        "problem":  "HaloTextHelper API may have changed in B42.",
+        "fix":      "Check the B42 annotated class list for the current HaloTextHelper API.",
+        "code":     "-- https://demiurgequantified.github.io/ProjectZomboidLuaDocs/annotated.html",
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/annotated.html",
+    },
+    {
+        "match":    "ZomboidGlobals",
+        "category": "Lua – Fragile Call",
+        "problem":  "ZomboidGlobals access may have changed in B42. Some global values moved to SandboxVars or GameSettings.",
+        "fix":      "Check the B42 JavaDocs for ZomboidGlobals and verify each field you use still exists.",
+        "code":     (
+            "-- Verify each field in B42 JavaDocs:\n"
+            "-- https://demiurgequantified.github.io/ProjectZomboidJavaDocs/\n\n"
+            "-- Common alternative:\n"
+            "-- ZomboidGlobals.MaxWeight → SandboxVars.MaxWeight (if moved)"
+        ),
+        "docs":     "https://demiurgequantified.github.io/ProjectZomboidJavaDocs/",
+    },
 ]
 
 
@@ -393,15 +560,21 @@ class QuickFixTab:
 
         # ── Top action bar ────────────────────────────────────────────────
         top_row = QHBoxLayout()
-        load_btn = QPushButton("📂 Load Report")
+        load_btn  = QPushButton("📂 Load Report")
         load_btn.setToolTip("Load a previously saved compatibility report (.txt)")
-        docs_btn = QPushButton("📖 B42 Lua Docs")
-        docs_btn.setToolTip("Open the B42 Lua events reference in your browser")
-        java_btn = QPushButton("☕ B42 Java Docs")
-        java_btn.setToolTip("Open the B42 Java API reference in your browser")
+        docs_btn  = QPushButton("📖 Events")
+        docs_btn.setToolTip("B42 Lua Events reference")
+        hooks_btn = QPushButton("🪝 Hooks")
+        hooks_btn.setToolTip("B42 Lua Hooks reference")
+        cb_btn    = QPushButton("📞 Callbacks")
+        cb_btn.setToolTip("B42 Lua Callbacks reference")
+        java_btn  = QPushButton("☕ JavaDocs")
+        java_btn.setToolTip("B42 Java API reference")
         top_row.addWidget(load_btn)
         top_row.addStretch()
         top_row.addWidget(docs_btn)
+        top_row.addWidget(hooks_btn)
+        top_row.addWidget(cb_btn)
         top_row.addWidget(java_btn)
         layout.addLayout(top_row)
 
@@ -604,6 +777,12 @@ class QuickFixTab:
         load_btn.clicked.connect(_load_report)
         docs_btn.clicked.connect(lambda: webbrowser.open(
             "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Events.html"
+        ))
+        hooks_btn.clicked.connect(lambda: webbrowser.open(
+            "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Hooks.html"
+        ))
+        cb_btn.clicked.connect(lambda: webbrowser.open(
+            "https://demiurgequantified.github.io/ProjectZomboidLuaDocs/md_Callbacks.html"
         ))
         java_btn.clicked.connect(lambda: webbrowser.open(
             "https://demiurgequantified.github.io/ProjectZomboidJavaDocs/"

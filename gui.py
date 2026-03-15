@@ -1,3 +1,5 @@
+# Version 1.3
+
 import sys
 import json
 import traceback
@@ -14,7 +16,7 @@ from PyQt6.QtWidgets import (
     QGraphicsOpacityEffect, QCheckBox, QSlider, QRadioButton, QButtonGroup,
     QHeaderView
 )
-from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QObject, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QObject, pyqtSignal, QUrl
 
 # ── Thread-safe main-thread dispatcher ───────────────────────────────────────
 class _Dispatcher(QObject):
@@ -37,7 +39,7 @@ from gui_themes import THEME_STYLES
 from indexer import GameAPI
 from modparser import ModReferences
 from comparison import CompatibilityChecker
-from gui_tabs import SaveInfoTab, ConflictCheckerTab, QuickFixTab, DebugTab, DEBUG
+from gui_tabs import MapTab, SaveInfoTab, ConflictCheckerTab, QuickFixTab, DebugTab, DEBUG
 
 
 class ConsoleRedirect:
@@ -79,7 +81,7 @@ class CompatibilityGUI(QMainWindow):
         self._build_ui()
         self._load_last_paths()
         self._detect_workshop()
-        self.statusBar().showMessage("✅ v1.2 - Initiated - Enjoy")
+        self.statusBar().showMessage("✅ v1.3 - Initiated - Enjoy")
         self._on_mode_changed()
 
     # Settings Tab    
@@ -217,6 +219,7 @@ class CompatibilityGUI(QMainWindow):
         self.tab_results = QWidget()
         self.tab_save     = QWidget()
         self.tab_conflict = QWidget()
+        self.tab_map = QWidget()
         self.tab_quickfix = QWidget()
         self.tab_docs = QWidget()
         self.tab_settings = QWidget()
@@ -227,6 +230,7 @@ class CompatibilityGUI(QMainWindow):
         self.tabs.addTab(self.tab_results,  "📊 Results")
         self.tabs.addTab(self.tab_save,     "💾 Save Info")
         self.tabs.addTab(self.tab_conflict, "⚔️ Conflicts")
+        self.tabs.addTab(self.tab_map, "🗺️ Map")
         self.tabs.addTab(self.tab_quickfix, "💡 Quick Fix")
         self.tabs.addTab(self.tab_docs,     "📖 B42 Docs")
         self.tabs.addTab(self.tab_settings, "⚙️ Settings")
@@ -238,6 +242,7 @@ class CompatibilityGUI(QMainWindow):
         self._build_results_tab()
         SaveInfoTab.build(self.tab_save, self.detected_mods)
         ConflictCheckerTab.build(self.tab_conflict, self.detected_mods)
+        MapTab.build(self.tab_map)
         QuickFixTab.build(self.tab_quickfix)
         self._build_docs_tab()
         self._build_settings_tab()

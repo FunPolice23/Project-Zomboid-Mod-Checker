@@ -3,6 +3,9 @@ import os
 import threading
 import platform
 import traceback as _traceback
+import subprocess
+import sqlite3
+
 from datetime import datetime
 from pathlib import Path
 
@@ -87,7 +90,7 @@ def _find_pz_saves_dir() -> Path | None:
 #       {SaveName}/      timestamp or custom name
 #         *.bin, *.lua, players.db, mods.txt, ...
 #
-# We detect leaf save folders by presence of at least one known save file.
+#  detect leaf save folders by presence of at least one known save file.
 
 _SAVE_MARKER_FILES = {"WorldDictionary.bin", "players.db", "vehicles.db", "mods.txt"}
 
@@ -248,10 +251,6 @@ def _scan_all_saves(saves_root: Path, log=None, add_callback=None):
 # 0.  DEBUG TAB  (shown only when DEBUG = True)
 # ══════════════════════════════════════════════════════════════════════════════
 
-# ══════════════════════════════════════════════════════════════════════════════
-# 0.  DEBUG TAB  (shown only when DEBUG = True)
-# ══════════════════════════════════════════════════════════════════════════════
-
 class DebugTab:
     """
     Rich live debug console. Captures:
@@ -314,7 +313,7 @@ class DebugTab:
         copy_btn  = QPushButton("📋 Copy")
         save_btn  = QPushButton("💾 Save")
         for b in (clear_btn, copy_btn, save_btn):
-            b.setFixedHeight(28)
+            b.setFixedHeight(44)
         toolbar.addWidget(title)
         toolbar.addStretch()
         toolbar.addWidget(autoscroll_cb)
@@ -328,9 +327,9 @@ class DebugTab:
         filter_row = QHBoxLayout()
         filter_box = QLineEdit()
         filter_box.setPlaceholderText("🔍 Filter… (keyword or tag like [CRASH])")
-        filter_box.setFixedHeight(26)
+        filter_box.setFixedHeight(34)
         cat_combo = QComboBox()
-        cat_combo.setFixedHeight(26)
+        cat_combo.setFixedHeight(34)
         cat_combo.addItem("All categories")
         for tag in DebugTab._COLOURS:
             cat_combo.addItem(tag.strip("[]"))
@@ -497,9 +496,6 @@ class DebugTab:
         DebugTab.dbg(f"Python {_sys.version}", "[UI]")
         DebugTab.dbg(f"stdout/stderr captured | excepthook installed", "[UI]")
 
-
-
-
 # ══════════════════════════════════════════════════════════════════════════════
 # 1.  MAP TAB
 # ══════════════════════════════════════════════════════════════════════════════
@@ -653,16 +649,35 @@ def _read_map_ver(map_ver_path: Path) -> str:
 def _parse_save_folder(save_path: Path) -> dict:
     """
     Fast targeted extraction — only the files we need. No freeze.
-    Now cleans the weird save mods.txt format.
+    Single os.walk pass for all file counts + size instead of 3 separate rglobs.
     """
     info = {
         "Active Mods": [], "Files Found": 0, "Total Size": 0,
         "Thumbnail": None, "_db_fields": {}, "Map Version": "—"
     }
 
-    # Size & count (fast)
-    info["Total Size"] = _fast_dir_size(save_path, max_depth=3)
-    info["Files Found"] = sum(1 for _ in save_path.rglob("*"))
+    # ── Single walk: size + all file counts at once (no repeated rglob) ──
+    total_bytes = total_files = bin_count = lua_count = 0
+    try:
+        for root, dirs, files in os.walk(save_path):
+            for fname in files:
+                total_files += 1
+                try:
+                    total_bytes += os.path.getsize(os.path.join(root, fname))
+                except OSError:
+                    pass
+                low = fname.lower()
+                if low.endswith(".bin"):
+                    bin_count += 1
+                elif low.endswith(".lua"):
+                    lua_count += 1
+    except Exception:
+        pass
+
+    info["Files Found"]         = total_files
+    info["Total Size"]          = total_bytes
+    info["Binary Files (.bin)"] = str(bin_count)
+    info["Lua Files (.lua)"]    = str(lua_count)
 
     # Thumbnail
     thumb_path = save_path / "thumb.png"
@@ -691,7 +706,7 @@ def _parse_save_folder(save_path: Path) -> dict:
             clean_mods = []
             for line in raw:
                 if line.startswith("mod ="):
-                    mod_id = line.split("=", 1)[1].strip().strip("\\, ")  # remove \, and comma
+                    mod_id = line.split("=", 1)[1].strip().strip("\\, ")
                     if mod_id:
                         clean_mods.append(mod_id)
             info["Active Mods"] = clean_mods
@@ -703,7 +718,7 @@ def _parse_save_folder(save_path: Path) -> dict:
         if m:
             info["Active Mods"] = [x.strip().strip('"\'') for x in m.group(1).split(",") if x.strip()]
 
-    # ── Text patterns, map_ver, players.db, radio (unchanged) ───────
+    # ── Text patterns, map_ver, players.db, radio ────────────────────
     for field, pat in _SAVE_TEXT_PATTERNS.items():
         if field == "Map Version":
             continue
@@ -741,12 +756,6 @@ def _parse_save_folder(save_path: Path) -> dict:
     radio_txt = save_path / "radio" / "data" / "RADIO_SAVE.txt"
     if radio_txt.exists():
         info.update(_read_radio_save(radio_txt))
-
-    # File counts
-    bin_count = sum(1 for f in save_path.rglob("*.bin") if f.is_file())
-    lua_count = sum(1 for f in save_path.rglob("*.lua") if f.is_file())
-    info["Binary Files (.bin)"] = str(bin_count)
-    info["Lua Files (.lua)"] = str(lua_count)
 
     size_mb = info["Total Size"] / 1024 / 1024
     info["Total Size"] = f"{size_mb:.1f} MB"
@@ -821,10 +830,10 @@ class SaveInfoTab:
         saves_root_entry = QLineEdit()
         saves_root_entry.setReadOnly(True)
         saves_root_entry.setPlaceholderText("Saves root folder…")
-        #auto_btn   = QPushButton("🔍 Auto-Detect Saves")
-        browse_btn = QPushButton("📁 Browse Saves Root")
+        auto_btn   = QPushButton("🔍 Auto-Detect")
+        browse_btn = QPushButton("📁 Browse")
         top_row.addWidget(saves_root_entry, stretch=1)
-        #top_row.addWidget(auto_btn)
+        top_row.addWidget(auto_btn)
         top_row.addWidget(browse_btn)
         layout.addLayout(top_row)
 
@@ -1321,7 +1330,7 @@ class SaveInfoTab:
         else:
             status.setText("⚠️ Could not auto-detect ~/Zomboid/Saves — use Browse.")
 
-        #auto_btn.clicked.connect(_auto_detect)
+        auto_btn.clicked.connect(_auto_detect)
         browse_btn.clicked.connect(_browse)
         save_tree.itemClicked.connect(_on_save_selected)
 
@@ -1456,16 +1465,16 @@ class ConflictCheckerTab:
         # ── Run button + scan log ─────────────────────────────────────────
         run_row = QHBoxLayout()
         run_btn = QPushButton("🔍 Check A vs B")
-        run_btn.setFixedHeight(44)
+        run_btn.setFixedHeight(50)
         progress = QProgressBar()
         progress.setVisible(False)
 
         # ── Run buttons row 1: A-vs-B + Workshop loader ───────────────────
         run_row1 = QHBoxLayout()
         run_btn = QPushButton("🔍 Check A vs B")
-        run_btn.setFixedHeight(36)
+        run_btn.setFixedHeight(50)
         workshop_btn = QPushButton("📦 Load Workshop Mods")
-        workshop_btn.setFixedHeight(36)
+        workshop_btn.setFixedHeight(50)
         workshop_btn.setToolTip("Load the full workshop mod cache into the list above for manual A vs B comparison.")
         progress = QProgressBar()
         progress.setVisible(False)
@@ -1477,13 +1486,13 @@ class ConflictCheckerTab:
         # ── Run buttons row 2: Bulk scan + stop ───────────────────────────
         run_row2 = QHBoxLayout()
         bulk_btn = QPushButton("🔥 Bulk One-vs-All Scan")
-        bulk_btn.setFixedHeight(36)
+        bulk_btn.setFixedHeight(50)
         bulk_btn.setToolTip("Scans every mod in the list against every other.\nResults + full report saved automatically.")
         stop_btn = QPushButton("⏹ Stop")
-        stop_btn.setFixedHeight(36)
+        stop_btn.setFixedHeight(50)
         stop_btn.setEnabled(False)
         copy_btn = QPushButton("📋 Copy Mod IDs")
-        copy_btn.setFixedHeight(36)
+        copy_btn.setFixedHeight(50)
         run_row2.addWidget(bulk_btn, stretch=2)
         run_row2.addWidget(stop_btn, stretch=1)
         run_row2.addWidget(copy_btn, stretch=1)
@@ -1645,6 +1654,9 @@ class ConflictCheckerTab:
                     lua_conflicts = []
 
                     total = len(shared)
+
+                    SKIP = {"mod.info", "preview.png", "thumb.png"}
+
                     for i, rel in enumerate(sorted(shared), 1):
                         if Path(rel).name.lower() in SKIP:
                             continue
@@ -1852,4 +1864,3 @@ class ConflictCheckerTab:
         """Call from gui.py after workshop scan completes to populate the mod list."""
         if ConflictCheckerTab._refresh_mods_fn:
             _ui(lambda m=mods: ConflictCheckerTab._refresh_mods_fn(m))
-
