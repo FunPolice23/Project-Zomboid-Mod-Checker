@@ -63,7 +63,7 @@ python gui.py
 ### License
 This project is licensed under the MIT License — free to use, modify, and redistribute.
 
-### CLI:
+### CLI: [Optional use]
 python main.py <gamepath> <modpath> [options]
 options flags:
 
