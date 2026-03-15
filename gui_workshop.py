@@ -1,11 +1,24 @@
 from pathlib import Path
 from datetime import datetime
-from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtCore import QTimer, Qt, QObject, pyqtSignal
 from PyQt6.QtWidgets import QMessageBox, QTreeWidgetItem
 from gui_helpers import DOCS_DIR
 import json
 import threading
 import traceback
+
+# ── Thread-safe main-thread dispatcher ───────────────────────────────────────
+class _WS_Dispatcher(QObject):
+    _call = pyqtSignal(object)
+    def __init__(self):
+        super().__init__()
+        self._call.connect(lambda fn: fn())
+
+_ws_dispatcher = _WS_Dispatcher()
+
+def _ui(fn):
+    """Schedule fn() on the main Qt thread. Safe to call from any thread."""
+    _ws_dispatcher._call.emit(fn)
 
 CACHE_FILE = DOCS_DIR / "workshop_cache.json"
 CACHE_VERSION = 2
@@ -29,16 +42,16 @@ class WorkshopScanner:
                 for mod_id_dir in content_path.iterdir():
                     if not gui.scanning: break
                     if not mod_id_dir.name.isdigit(): continue
-                    QTimer.singleShot(0, lambda n=mod_id_dir.name: gui.console_text.append(f"→ Found mod ID folder: {n}\n"))
+                    _ui(lambda n=mod_id_dir.name: gui.console_text.append(f"→ Found mod ID folder: {n}\n"))
                     WorkshopScanner._recurse_mod_folder(gui, mod_id_dir)
                 if gui.scanning:
-                    QTimer.singleShot(0, gui._finish_scan_ui)
+                    _ui(gui._finish_scan_ui)
                     WorkshopScanner.save_cache(gui)
             except Exception as e:
                 error_msg = f"=== THREAD CRASH IN SCANNER ===\n{traceback.format_exc()}"
                 with open(str(DOCS_DIR / "crash.log"), "w", encoding="utf-8") as f:
                     f.write(error_msg)
-                QTimer.singleShot(0, lambda: QMessageBox.critical(gui, "Scanner Crash", f"Scan crashed!\nDetails saved to crash.log\n\n{str(e)[:300]}"))
+                _ui(lambda err=e: QMessageBox.critical(gui, "Scanner Crash", f"Scan crashed!\nDetails saved to crash.log\n\n{str(err)[:300]}"))
 
         threading.Thread(target=worker, daemon=True).start()
 
