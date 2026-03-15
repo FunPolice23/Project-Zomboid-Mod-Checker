@@ -14,8 +14,20 @@ from PyQt6.QtWidgets import (
     QGraphicsOpacityEffect, QCheckBox, QSlider, QRadioButton, QButtonGroup,
     QHeaderView
 )
-from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QUrl
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QObject, pyqtSignal
+
+# ── Thread-safe main-thread dispatcher ───────────────────────────────────────
+class _Dispatcher(QObject):
+    _call = pyqtSignal(object)
+    def __init__(self):
+        super().__init__()
+        self._call.connect(lambda fn: fn())
+
+_dispatcher = _Dispatcher()
+
+def _ui(fn):
+    """Schedule fn() on the main Qt thread. Safe to call from any thread."""
+    _dispatcher._call.emit(fn)
 from PyQt6.QtGui import QFont, QColor
 
 # ── split modules ──
@@ -25,6 +37,8 @@ from gui_themes import THEME_STYLES
 from indexer import GameAPI
 from modparser import ModReferences
 from comparison import CompatibilityChecker
+from gui_tabs import MapTab, SaveInfoTab, ConflictCheckerTab, QuickFixTab, DebugTab, DEBUG
+
 
 class ConsoleRedirect:
     def __init__(self, text_widget):
@@ -34,8 +48,9 @@ class ConsoleRedirect:
     def write(self, text):
         self.buffer += text
         if "\n" in self.buffer:
-            QTimer.singleShot(0, lambda: self.text_widget.append(self.buffer.strip()))
+            chunk = self.buffer.strip()
             self.buffer = ""
+            _ui(lambda c=chunk: self.text_widget.append(c))
 
     def flush(self):
         pass
@@ -62,7 +77,6 @@ class CompatibilityGUI(QMainWindow):
         self.output_var = str(DOCS_DIR / "compatibility_report.txt")
 
         self._build_ui()
-        #self.tabs.currentChanged.connect(self._on_tab_changed)
         self._load_last_paths()
         self._detect_workshop()
         self.statusBar().showMessage("✅ v1.2 - Initiated - Enjoy")
@@ -201,23 +215,37 @@ class CompatibilityGUI(QMainWindow):
         self.tab_main = QWidget()
         self.tab_console = QWidget()
         self.tab_results = QWidget()
-        self.tab_map = QWidget()
+        self.tab_map      = QWidget()
+        self.tab_save     = QWidget()
+        self.tab_conflict = QWidget()
+        self.tab_quickfix = QWidget()
         self.tab_docs = QWidget()
         self.tab_settings = QWidget()
+        self.tab_debug    = QWidget() if DEBUG else None
 
-        self.tabs.addTab(self.tab_main, "🏠 Main")
-        self.tabs.addTab(self.tab_console, "📜 Console")
-        self.tabs.addTab(self.tab_results, "📊 Results")
-        self.tabs.addTab(self.tab_map, "🗺️ B42 Map")
-        self.tabs.addTab(self.tab_docs, "📖 B42 Docs")
+        self.tabs.addTab(self.tab_main,     "🏠 Main")
+        self.tabs.addTab(self.tab_console,  "📜 Console")
+        self.tabs.addTab(self.tab_results,  "📊 Results")
+        self.tabs.addTab(self.tab_map,      "🗺️ Map")
+        self.tabs.addTab(self.tab_save,     "💾 Save Info")
+        self.tabs.addTab(self.tab_conflict, "⚔️ Conflicts")
+        self.tabs.addTab(self.tab_quickfix, "💡 Quick Fix")
+        self.tabs.addTab(self.tab_docs,     "📖 B42 Docs")
         self.tabs.addTab(self.tab_settings, "⚙️ Settings")
+        if DEBUG:
+            self.tabs.addTab(self.tab_debug, "🐛 Debug")
 
         self._build_main_tab()
         self._build_console_tab()
         self._build_results_tab()
-        self._build_map_tab()
+        MapTab.build(self.tab_map)
+        SaveInfoTab.build(self.tab_save, self.detected_mods)
+        ConflictCheckerTab.build(self.tab_conflict, self.detected_mods)
+        QuickFixTab.build(self.tab_quickfix)
         self._build_docs_tab()
         self._build_settings_tab()
+        if DEBUG:
+            DebugTab.build(self.tab_debug)
 
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
@@ -319,21 +347,6 @@ class CompatibilityGUI(QMainWindow):
 
         self.tab_main.setLayout(layout)
 
-    def _build_map_tab(self):
-        layout = QVBoxLayout()
-        btn_row = QHBoxLayout()
-        
-        self.map_b42_btn = QPushButton("🗺️ B42 Map")
-        self.map_b41_btn = QPushButton("🗺️ Classic Map")
-        self.map_b42_btn.clicked.connect(lambda: self.map_view.setUrl(QUrl("https://b42map.com/")))
-        btn_row.addWidget(self.map_b42_btn)
-        layout.addLayout(btn_row)
-
-        self.map_view = QWebEngineView()
-        self.map_view.setUrl(QUrl("https://b42map.com/"))
-        layout.addWidget(self.map_view, stretch=1)
-        #self.tab_map.setLayout(layout)
-
     def _build_docs_tab(self):
         layout = QVBoxLayout()
         layout.setContentsMargins(40, 40, 40, 40)
@@ -391,38 +404,40 @@ class CompatibilityGUI(QMainWindow):
         
         self.tab_results.setLayout(layout)
 
-    def _force_results_redraw(self):
-        """Bulletproof redraw — forces Qt to show every item instantly"""
-        self.results_tree.setVisible(True)
-        self.results_tree.show()
-        for col in range(3):
-            self.results_tree.resizeColumnToContents(col)
-        self.results_tree.viewport().update()
-        self.results_tree.repaint()
-        self.results_tree.updateGeometry()
-        QTimer.singleShot(0, self.results_tree.repaint)
-        QTimer.singleShot(30, self.results_tree.viewport().update)
-        QTimer.singleShot(120, lambda: self.results_tree.setCurrentItem(
-            self.results_tree.topLevelItem(0) if self.results_tree.topLevelItemCount() > 0 else None
-        ))
-
     def _animate_button(self):
-        anim = QPropertyAnimation(self.run_btn, b"geometry")
-        anim.setDuration(180)
-        anim.setEasingCurve(QEasingCurve.Type.OutQuad)
+        """Pulse the run button outward then snap back — called on scan start."""
+        if not self.anim_check.isChecked():
+            return
+        self._btn_anim = QPropertyAnimation(self.run_btn, b"geometry")
+        self._btn_anim.setDuration(180)
+        self._btn_anim.setEasingCurve(QEasingCurve.Type.OutQuad)
         rect = self.run_btn.geometry()
-        anim.setStartValue(rect)
-        anim.setEndValue(rect.adjusted(-6, -6, 6, 6))
-        anim.start()
+        self._btn_anim.setStartValue(rect)
+        self._btn_anim.setEndValue(rect.adjusted(-6, -6, 6, 6))
+        self._btn_anim.finished.connect(lambda: self._animate_button_back(rect))
+        self._btn_anim.start()
 
-    def _fade_in_results(self):
-        effect = QGraphicsOpacityEffect()
-        self.results_tree.setGraphicsEffect(effect)
-        anim = QPropertyAnimation(effect, b"opacity")
-        anim.setDuration(700)
-        anim.setStartValue(0)
-        anim.setEndValue(1)
-        anim.start()
+    def _animate_button_back(self, original_rect):
+        """Snap the button back to original size."""
+        self._btn_anim_back = QPropertyAnimation(self.run_btn, b"geometry")
+        self._btn_anim_back.setDuration(120)
+        self._btn_anim_back.setEasingCurve(QEasingCurve.Type.InQuad)
+        self._btn_anim_back.setStartValue(self.run_btn.geometry())
+        self._btn_anim_back.setEndValue(original_rect)
+        self._btn_anim_back.start()
+
+    def _fade_in_tab(self, widget: QWidget):
+        """Fade a tab widget in from transparent — used when switching to Results."""
+        if not self.anim_check.isChecked():
+            return
+        effect = QGraphicsOpacityEffect(widget)
+        widget.setGraphicsEffect(effect)
+        self._fade_anim = QPropertyAnimation(effect, b"opacity")
+        self._fade_anim.setDuration(350)
+        self._fade_anim.setStartValue(0.0)
+        self._fade_anim.setEndValue(1.0)
+        self._fade_anim.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        self._fade_anim.start()
 
     def _get_default_jar_path(self):
         steam_root = get_steam_install_path()
@@ -489,6 +504,10 @@ class CompatibilityGUI(QMainWindow):
 
     def _finish_scan_ui(self):
         WorkshopScanner.finish_scan_ui(self)
+        ConflictCheckerTab.refresh_mods(self.detected_mods)
+        SaveInfoTab.refresh_index(self.detected_mods)
+        if DEBUG:
+            DebugTab.dbg(f"Workshop scan complete — {len(self.detected_mods)} mods", "[SCAN]")
 
     def _final_sort_and_resize(self):
         self.workshop_tree.sortItems(0, Qt.SortOrder.AscendingOrder)
@@ -522,6 +541,7 @@ class CompatibilityGUI(QMainWindow):
     def _start_check(self):
         if self.running: return
         self.running = True
+        self._animate_button()
         self.run_btn.setEnabled(False)
         self.run_btn.setText("Running...")
         self.tabs.setCurrentWidget(self.tab_console)
@@ -534,13 +554,15 @@ class CompatibilityGUI(QMainWindow):
         threading.Thread(target=self._run_backend, daemon=True).start()
 
     def _run_backend(self):
+        if DEBUG:
+            DebugTab.dbg(f"_run_backend started — mod: {self.mod_entry.text().strip()!r}", "[SCAN]")
         try:
             lua_only = self.mode_lua.isChecked()
             mod_path = self.mod_entry.text().strip()
 
             if not mod_path:
                 print("❌ No mod selected!")  # safe print
-                QTimer.singleShot(0, self._reset_run_button)
+                _ui(self._reset_run_button)
                 return
 
             print(f"→ Scanning mod: {Path(mod_path).name}")
@@ -563,11 +585,11 @@ class CompatibilityGUI(QMainWindow):
                 game_path = self.game_entry.text().strip()
                 if game_path in ["(Lua-only — no game source needed)", ""]:
                     game_path = self._get_default_jar_path()
-                    QTimer.singleShot(0, lambda p=game_path: self.game_entry.setText(p))
+                    _ui(lambda p=game_path: self.game_entry.setText(p))
 
                 if not game_path:
                     print("❌ No game path selected!")
-                    QTimer.singleShot(0, self._reset_run_button)
+                    _ui(self._reset_run_button)
                     return
 
                 print("→ Building game API index...")
@@ -583,19 +605,24 @@ class CompatibilityGUI(QMainWindow):
 
             self.current_issues = self.issues.copy()
 
-            QTimer.singleShot(0, lambda: self.tabs.setCurrentWidget(self.tab_results))
-            QTimer.singleShot(300, self._populate_results)
+            QuickFixTab.refresh(self.current_issues)
+
+            _ui(lambda: self.tabs.setCurrentWidget(self.tab_results))
+            _ui(lambda: QTimer.singleShot(50, lambda: self._fade_in_tab(self.tab_results)))
+            _ui(lambda: QTimer.singleShot(300, self._populate_results))
 
         except Exception as e:
             error_msg = f"\nCRASH: {str(e)}\n{traceback.format_exc()}"
             print(error_msg)
             with open(str(DOCS_DIR / "crash.log"), "w", encoding="utf-8") as f:
                 f.write(error_msg)
-            QTimer.singleShot(0, lambda: QMessageBox.critical(self, "Crash", f"Crash occurred!\nDetails saved to {DOCS_DIR / 'crash.log'}"))
+            if DEBUG:
+                DebugTab.dbg(f"💥 CRASH in _run_backend: {e}\n{traceback.format_exc()}", "[CRASH]")
+            _ui(lambda: QMessageBox.critical(self, "Crash", f"Crash occurred!\nDetails saved to {DOCS_DIR / 'crash.log'}"))
         finally:
             sys.stdout = sys.__stdout__
             sys.stderr = sys.__stderr__
-            QTimer.singleShot(0, self._reset_run_button)
+            _ui(self._reset_run_button)
 
     def _populate_results(self):
         if getattr(self, "_populating", False):
@@ -754,7 +781,7 @@ if __name__ == "__main__":
         sys.exit(app.exec())
     except Exception as e:
         error_msg = f"=== CRASH ON STARTUP ===\n{traceback.format_exc()}"
-        with open("crash.log", "w", encoding="utf-8") as f:
+        with open(str(DOCS_DIR / "crash.log"), "w", encoding="utf-8") as f:
             f.write(error_msg)
         QMessageBox.critical(None, "Crash", f"Startup crash!\nDetails saved to crash.log")
         sys.exit(1)
