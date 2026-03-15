@@ -14,6 +14,13 @@ if errorlevel 1 (
     pause & exit /b 1
 )
 
+REM Warn if running Python 3.14+ (not fully tested with all deps)
+for /f "tokens=2 delims= " %%v in ('python --version 2^>^&1') do set PYVER=%%v
+echo Detected Python %PYVER%
+echo NOTE: Python 3.14+ is experimental with PyInstaller and kirjava.
+echo       If the build fails, try Python 3.11 or 3.12.
+echo.
+
 pyinstaller --version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: PyInstaller not found.
@@ -39,19 +46,6 @@ pyinstaller ^
   --hidden-import kirjava ^
   --hidden-import tqdm ^
   --hidden-import sqlite3 ^
-  --add-data "gui_debug.py;." ^
-  --add-data "gui_save.py;." ^
-  --add-data "gui_conflict.py;." ^
-  --add-data "gui_quickfix.py;." ^
-  --add-data "gui_tabs.py;." ^
-  --add-data "gui_workshop.py;." ^
-  --add-data "gui_helpers.py;." ^
-  --add-data "gui_themes.py;." ^
-  --add-data "indexer.py;." ^
-  --add-data "modparser.py;." ^
-  --add-data "comparison.py;." ^
-  --add-data "luaparser.py;." ^
-  --add-data "constants.py;." ^
   gui.py
 
 echo.
