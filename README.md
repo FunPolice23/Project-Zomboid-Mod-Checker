@@ -1,11 +1,11 @@
 # PZ Mod Compatibility Checker – Build 42 Edition 🧟
 
-A user-friendly tool to check if your Project Zomboid mods will work on Build 42 (including the latest unstable patches).
+$\color{#0a761f}{\textsf{A user-friendly tool to check if your Project Zomboid mods will work on Build 42 (including the latest unstable patches).}}$ 
 
-After the massive Build 42 update, thousands of mods broke because of changed Java methods, removed Lua events,
-deprecated hooks, and fragile calls. This tool scans your mod like the game does and tells you what needs fixing — before you waste time testing in-game.
+$\color{#0a761f}{\textsf{After the massive Build 42 update, thousands of mods broke because of changed Java methods, removed Lua events,}}$ 
+$\color{#0a761f}{\textsf{deprecated hooks, and fragile calls. This tool scans your mod like the game does and tells you what needs fixing — before you waste time testing in-game.}}$ 
 
-## What It Does
+## <ins>What It Does</ins>
 
 It performs a complete compatibility audit on any mod:
 
@@ -16,9 +16,9 @@ visibility issues, and inheritance problems using real bytecode parsing.
 Lua analysis (client/server/shared scripts) — catches deprecated events, fragile calls (getPlayer, SandboxVars, getCore, etc.), and old hooks that were removed in B42.
 
 
-Shows color-coded results (red = critical errors, orange = warnings) with exact file:line locations.
+Shows color-coded results ($\color{red}{\textsf{red}}$  = critical errors, $\color{#e29800}{\textsf{orange}}$ = warnings) with exact file:line locations.
 
-## Key Features
+## <ins>Key Features</ins>
 
 30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
 
@@ -42,7 +42,7 @@ Interactive map from https://b42map.com/
 ### Additional future updates:
 Save information, Mod Conflict Check, Quick fix suggestions per error type.
 
-## How It Works
+## <ins>How It Works</ins>
 
 Uses kirjava for accurate Java bytecode parsing (opcodes, constant pool, LineNumberTable, inheritance traversal)
 
@@ -53,17 +53,17 @@ Fast caching system (versioned JSON + pickle) — first scan builds the index, l
 
 Thread-safe GUI with live batch updates so the interface never freezes
 
-### Installation & Usage
-Windows users
-Download the single .exe and run it — no Python required.
-### Linux / macOS users
+### <ins>Installation & Usage</ins>
+`#0969DA' Windows users
+`#0969DA`Download the single .exe and run it — no Python required.
+### <ins>Linux / macOS users</ins>
 Bash pip install -r requirements.txt
 python gui.py
 
-### License
+### <ins>License</ins>
 This project is licensed under the MIT License — free to use, modify, and redistribute.
 
-### CLI: [Optional use]
+### <ins>CLI</ins>: [Optional use]
 python main.py <gamepath> <modpath> [options]
 options flags:
 
@@ -77,7 +77,7 @@ options flags:
 
 --cache File # uses a custom cache, defaults to game_api_cache.pkl
 
-### Examples:
+### <ins>Examples</ins>:
 python main.py "[drive:]\Steam\steamapps\common\ProjectZomboid\projectzomboid.jar" "MyModFolder"
 
 
@@ -89,7 +89,7 @@ python main.py projectzomboid.jar MyMod --no-cache -v
 
 python main.py --help
 
-### My purpose for the program
+### <ins>My purpose for the program</ins>
 I enjoy project zomboid but recently a great mod/modder gave up which left their mod outdated, new unstable build changed certain things so this idea came in order to privatly update the mod myself with ease so I can play it again.
 
 My hope is that mabye this helps bring old mods back,
