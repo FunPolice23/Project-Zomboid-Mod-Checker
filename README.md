@@ -20,27 +20,29 @@ Shows color-coded results ($\color{red}{\textsf{red}}$  = critical errors, $\col
 
 ## <ins>Key Features</ins>
 
-30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
++ 30 beautiful themes (Dark Classic, Neon Cyber, Sunset Orange, Purple Teal Fusion, Crimson Gold, and many more mixed palettes)
 
-Full Workshop scanner with smart caching — scans 1000+ mods in seconds and remembers them
++ Full Workshop scanner with smart caching — scans 1000+ mods in seconds and remembers them
 Deep mod support — correctly handles complex folder structures (common/, 42/, nested mods like Knox Event Expanded)
 
 
-Open Data Folder button — instantly opens where all caches, reports, and logs are saved (native location on every OS)
++ Open Data Folder button — instantly opens where all caches, reports, and logs are saved (native location on every OS)
 
-Color-coded Results tab that stays populated (no more blank screen)
-Drag-to-move borderless window + transparency slider
-Built-in B42 documentation links (official Lua events, callbacks, JavaDocs)
-Clear cache buttons (Game API + Workshop) so you always stay up-to-date with the newest unstable builds
++ Color-coded Results tab that stays populated (no more blank screen)
++ Drag-to-move borderless window + transparency slider
++ Built-in B42 documentation links (official Lua events, callbacks, JavaDocs)
++ Clear cache buttons (Game API + Workshop) so you always stay up-to-date with the newest unstable builds
 
-Full CLI support for scripting or batch checking
++ Full CLI support for scripting or batch checking
 Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.config/PZModChecker on Linux,
 ~/Library/Application Support/PZModChecker on macOS)
 
-Interactive map from https://b42map.com/
++ Interactive map from https://b42map.com/
 
 ### Additional future updates:
-Save information, Mod Conflict Check, Quick fix suggestions per error type.
++ Save information
++ Mod Conflict Check
++ Quick fix suggestions per error type.
 
 ## <ins>How It Works</ins>
 
