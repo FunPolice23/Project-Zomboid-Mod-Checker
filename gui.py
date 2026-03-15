@@ -37,7 +37,7 @@ from gui_themes import THEME_STYLES
 from indexer import GameAPI
 from modparser import ModReferences
 from comparison import CompatibilityChecker
-from gui_tabs import MapTab, SaveInfoTab, ConflictCheckerTab, QuickFixTab, DebugTab, DEBUG
+from gui_tabs import SaveInfoTab, ConflictCheckerTab, QuickFixTab, DebugTab, DEBUG
 
 
 class ConsoleRedirect:
@@ -215,7 +215,6 @@ class CompatibilityGUI(QMainWindow):
         self.tab_main = QWidget()
         self.tab_console = QWidget()
         self.tab_results = QWidget()
-        self.tab_map      = QWidget()
         self.tab_save     = QWidget()
         self.tab_conflict = QWidget()
         self.tab_quickfix = QWidget()
@@ -226,7 +225,6 @@ class CompatibilityGUI(QMainWindow):
         self.tabs.addTab(self.tab_main,     "🏠 Main")
         self.tabs.addTab(self.tab_console,  "📜 Console")
         self.tabs.addTab(self.tab_results,  "📊 Results")
-        self.tabs.addTab(self.tab_map,      "🗺️ Map")
         self.tabs.addTab(self.tab_save,     "💾 Save Info")
         self.tabs.addTab(self.tab_conflict, "⚔️ Conflicts")
         self.tabs.addTab(self.tab_quickfix, "💡 Quick Fix")
@@ -238,7 +236,6 @@ class CompatibilityGUI(QMainWindow):
         self._build_main_tab()
         self._build_console_tab()
         self._build_results_tab()
-        MapTab.build(self.tab_map)
         SaveInfoTab.build(self.tab_save, self.detected_mods)
         ConflictCheckerTab.build(self.tab_conflict, self.detected_mods)
         QuickFixTab.build(self.tab_quickfix)
