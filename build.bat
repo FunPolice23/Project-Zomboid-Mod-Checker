@@ -14,7 +14,7 @@ if errorlevel 1 (
     pause & exit /b 1
 )
 
-REM Warn if running Python 3.14+ (not fully tested with all deps)
+REM Warn if running Python 3.14+ (not fully tested with all deps, I use win 11 with python 3.14)
 for /f "tokens=2 delims= " %%v in ('python --version 2^>^&1') do set PYVER=%%v
 echo Detected Python %PYVER%
 echo NOTE: Python 3.14+ is experimental with PyInstaller and kirjava.
