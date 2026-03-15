@@ -38,10 +38,8 @@ Auto-saves reports to a clean folder (Documents/PZModChecker on Windows, ~/.conf
 ~/Library/Application Support/PZModChecker on macOS)
 
 + Interactive map from https://b42map.com/
-
-### Additional future updates:
-+ Save information
-+ Mod Conflict Check
++ Save information + Mod Conflict check
++ Mod Conflict Check against workshop mods(bulk or single) double click to select both A and B paths.
 + Quick fix suggestions per error type.
 
 ## <ins>How It Works</ins>
