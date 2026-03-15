@@ -1,22 +1,42 @@
-# ================================================
-# PZ Mod Compatibility Checker - Requirements
-# ================================================
+# ============================================================
+# PZ Mod Compatibility Checker — Requirements
+# ============================================================
 
-# === Runtime dependencies (needed to run the program) ===
+# ── Runtime (needed to run the program) ─────────────────────
+
+# GUI framework
 PyQt6>=6.5.0
-PyQt6-WebEngine # add a # infront to comment out, needed for B42 interactive map.
+
+# Java bytecode parsing (not on PyPI — see special note below)
+# kirjava
+
+# Progress bars (used in indexer.py and modparser.py)
 tqdm
 
-# === Build dependencies (needed to create the .exe with Pyinstaller) ===
-Pyinstaller
-zstandard
+# ── Optional runtime ─────────────────────────────────────────
 
-# ================================================
+# B42 interactive map tab (comment out if not needed)
+PyQt6-WebEngine
+
+# ── Build (needed to create the .exe with PyInstaller) ───────
+
+PyInstaller
+zstandard          # faster compression for the bundled exe
+
+# ============================================================
 # Special installation notes
-# ================================================
+# ============================================================
 
-# kirjava is not on PyPI — install from GitHub:
-# pip install git+https://github.com/notiska/kirjava.git
+# kirjava is not on PyPI. Install directly from GitHub:
+#
+#   pip install git+https://github.com/notiska/kirjava.git
+#
+# This must be done BEFORE running the program or building the exe.
 
-# How to install everything:
-# pip install -r requirements.txt
+# Full install sequence:
+#
+#   pip install -r requirements.txt
+#   pip install git+https://github.com/notiska/kirjava.git
+#
+# Python 3.11 or 3.12 recommended.
+# Python 3.13+ not fully tested with all dependencies.
