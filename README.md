@@ -54,8 +54,8 @@ Fast caching system (versioned JSON + pickle) — first scan builds the index, l
 Thread-safe GUI with live batch updates so the interface never freezes
 
 ### <ins>Installation & Usage</ins>
-`#0969DA' Windows users
-`#0969DA`Download the single .exe and run it — no Python required.
+Windows users
+Download the single .exe and run it — no Python required.
 ### <ins>Linux / macOS users</ins>
 Bash pip install -r requirements.txt
 python gui.py
