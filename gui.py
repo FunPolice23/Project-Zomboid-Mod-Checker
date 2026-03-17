@@ -75,7 +75,7 @@ class CompatibilityGUI(QMainWindow):
         self.verbose_scan = True
 
         self.config_path = Path.home() / ".pzmodchecker_config.json"
-        self.cache_var = str(DOCS_DIR / "game_api_cache.pkl")
+        self.cache_var = str(DOCS_DIR / "game_api_cache.json")
         self.output_var = str(DOCS_DIR / "compatibility_report.txt")
 
         self._build_ui()

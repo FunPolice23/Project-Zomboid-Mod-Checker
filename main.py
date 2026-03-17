@@ -21,7 +21,7 @@ Examples:
 
     parser.add_argument("game_path", help="projectzomboid.jar OR decompiled folder")
     parser.add_argument("mod_path", help="Mod .jar or folder")
-    parser.add_argument("--cache", default="game_api_cache.pkl", help="Cache file")
+    parser.add_argument("--cache", default="game_api_cache.json", help="Cache file")
     parser.add_argument("--no-cache", action="store_true", help="Force re-index")
     parser.add_argument("--output", "-o", help="Output report file")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed references")

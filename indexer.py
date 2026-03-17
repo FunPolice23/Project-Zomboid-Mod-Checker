@@ -1,5 +1,5 @@
 import os
-import pickle
+import json
 from pathlib import Path
 from tqdm import tqdm
 import zipfile
@@ -90,10 +90,10 @@ class GameAPI:
             self.save(cache_file)
 
     def save(self, path: str):
-        with open(path, "wb") as f:
-            pickle.dump({"classes": self.classes}, f)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"classes": self.classes}, f, indent=2, sort_keys=True)
 
     def load(self, path: str):
-        with open(path, "rb") as f:
-            data = pickle.load(f)
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
             self.classes = data["classes"]
